@@ -30,7 +30,7 @@ def fetch_news_for_date_range(company_name, single_date, interval_days):
 
 # Read company names from CSV file
 company_names = []
-with open('file path', 'r') as csvfile:
+with open('path/to/file', 'r') as csvfile:
     csvreader = csv.reader(csvfile)
     next(csvreader)  # Skip the header
     for row in csvreader:
@@ -70,7 +70,7 @@ for company in company_names:
         current_date += timedelta(days=interval_days)
 
     # Write unique headlines to a CSV file for the company
-    csv_file = f'folder path{company.replace(" ", "_")}_headlines.csv'
+    csv_file = f'path/to/folder{company.replace(" ", "_")}_headlines.csv'
     with open(csv_file, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Headline', 'Published Date', 'URL'])

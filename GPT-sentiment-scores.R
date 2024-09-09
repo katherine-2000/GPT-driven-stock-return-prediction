@@ -8,10 +8,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(lubridate)
-library(plm)
-library(lmtest)
-library(sandwich)
-library(fixest)
+
 
 # Set OpenAI API key 
 Sys.setenv(OPENAI_API_KEY = 'insert-your-api-key-here')
@@ -19,7 +16,7 @@ Sys.setenv(OPENAI_API_KEY = 'insert-your-api-key-here')
 # Define the directory containing the CSV files (adjust accordingly when using)
 directory <- "path/to/your/directory"
 
-# List all CSV files in the directory
+# List all CSV files in the directory (here it is assumed that file names contain company names)
 files <- list.files(directory, pattern = "\\.csv$", full.names = TRUE)
 
 # Process the first file (for demonstration, loop through all files if needed)
@@ -29,9 +26,7 @@ file = files[1]
 company_name <- gsub(" headlines$", "", gsub("_", " ", 
                                              tools::file_path_sans_ext(basename(file))), ignore.case = TRUE)
 
-# Read the CSV file containing headlines
 headlines_df <- read_csv(file)
-
 
 # Create an empty dataframe to store the API responses
 responses_df <- data.frame(headline = character(),
@@ -96,7 +91,6 @@ file_list <- list.files(path = folder_path, full.names = TRUE)
 # Function to process each file
 process_sentiment_file <- function(file_path) {
   
-  # Read the CSV file
   df <- read.csv(file_path)
   
   # Trim whitespace from 'message.content' column
@@ -114,11 +108,9 @@ process_sentiment_file <- function(file_path) {
   # Convert 'Published.Date' column to Date format
   df <- df %>%
     mutate(Published.Date = dmy_hms(Published.Date, tz = "GMT"))
-  
-  
-  # Create the new file name by replacing 'responses_df_' with 'responses_'
-  new_file_path <- sub("responses_df_", "responses_", file_path)
-  
+
+  # save the files in a new folder (if needed)
+  new_file_path <- "path/to/processed/sentiment/files" 
   
   # Save the modified data back to a new CSV
   write.csv(df, new_file_path, row.names = FALSE)
@@ -130,90 +122,3 @@ process_sentiment_file <- function(file_path) {
 
 # Loop through each sentiment file and process it 
 lapply(file_list, process_sentiment_file) 
-
-
-#########################################
-# Do Predictive Regressions
-#########################################
-
-
-# Define paths to sentiment and returns data directories
-sentiment_path_g <- "path/to/processed/sentiment/files/growing_companies"
-returns_path_g <- "path/to/return/files/growing_companies"  # (e.g. from Finance Yahoo)
-
-sentiment_path_v <- "path/to/processed/sentiment/files/value_companies"
-returns_path_v <- "path/to/return/files/value_companies" #  (e.g. from Finance Yahoo)
-
-# List all sentiment and returns files
-sentiment_files_g <- list.files(path = sentiment_path_g, full.names = TRUE)
-returns_files_g <- list.files(path = returns_path_g, full.names = TRUE)
-
-sentiment_files_v <- list.files(path = sentiment_path_v, full.names = TRUE)
-returns_files_v <- list.files(path = returns_path_v, full.names = TRUE)
-
-
-# Function to process each pair of sentiment and returns files
-process_files_final <- function(sentiment_file, returns_file) {
-  
-  # Read sentiment and returns data
-  sentiment_df <- read_csv(sentiment_file)
-  returns_df <- read_csv(returns_file)
-  
-  # Convert Published.Date to Date format, ignoring time
-  sentiment_df <- sentiment_df %>%
-    mutate(Date = as.Date(Published.Date, format = "%Y-%m-%d %H:%M:%S"))
-  
-  # Aggregate sentiment scores by date
-  aggregated_sentiment <- sentiment_df %>%
-    group_by(Date) %>%
-    summarise(Aggregated.Sentiment = mean(message.content, na.rm = TRUE))
-  
-  # Convert returns Date to Date format
-  returns_df <- returns_df %>%
-    mutate(Date = as.Date(Date))
-  
-  # Merge the aggregated sentiment with returns data
-  merged_df <- returns_df %>%
-    left_join(aggregated_sentiment, by = "Date")
-  
-  # Extract company name from file names and clean it - adjust as needed
-  company_name <- sub("responses_|\\.csv", "", basename(sentiment_file))
-  
-  # Add a column for company name
-  merged_df <- merged_df %>%
-    mutate(Company = company_name)
-  
-  # Select relevant columns
-  merged_df <- merged_df %>%
-    select(Date, Daily.Return, Company, Aggregated.Sentiment, Close, Open)
-  
-  return(merged_df)
-}
-
-
-# Apply the function to each pair of files
-all_data_g <- mapply(process_files_final, sentiment_files_g, returns_files_g, SIMPLIFY = FALSE) %>%
-  bind_rows()
-
-all_data_v <- mapply(process_files_final, sentiment_files_v, returns_files_v, SIMPLIFY = FALSE) %>%
-  bind_rows()
-
-
-# Convert data frames to panel data
-pdata_g <- pdata.frame(all_data_g, index = c("Company", "Date"))
-pdata_v <- pdata.frame(all_data_v, index = c("Company", "Date"))
-
-
-# Perform panel regression (Fixed Effects Model) with firm and time fixed effects
-model_g <- plm(Daily.Return ~ Aggregated.Sentiment + factor(Date) + factor(Company), data = pdata_g, model = "within")
-model_v <- plm(Daily.Return ~ Aggregated.Sentiment + factor(Date) + factor(Company), data = pdata_v, model = "within")
-
-
-# Alternatively, use fixest library
-model_g <- feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_g)
-model_v <- feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_v)
-
-summary_g <- summary(model_g, cluster ~ Company + Date)
-summary_v <- summary(model_v, cluster ~ Company + Date)
-
-

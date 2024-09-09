@@ -94,7 +94,7 @@ folder_path <- "path/to/sentiment/files"
 file_list <- list.files(path = folder_path, full.names = TRUE)
 
 # Function to process each file
-process_file <- function(file_path) {
+process_sentiment_file <- function(file_path) {
   
   # Read the CSV file
   df <- read.csv(file_path)
@@ -129,7 +129,7 @@ process_file <- function(file_path) {
 
 
 # Loop through each sentiment file and process it 
-lapply(file_list, process_file) 
+lapply(file_list, process_sentiment_file) 
 
 
 #########################################
@@ -153,7 +153,7 @@ returns_files_v <- list.files(path = returns_path_v, full.names = TRUE)
 
 
 # Function to process each pair of sentiment and returns files
-process_files <- function(sentiment_file, returns_file) {
+process_files_final <- function(sentiment_file, returns_file) {
   
   # Read sentiment and returns data
   sentiment_df <- read_csv(sentiment_file)
@@ -192,10 +192,10 @@ process_files <- function(sentiment_file, returns_file) {
 
 
 # Apply the function to each pair of files
-all_data_g <- mapply(process_files, sentiment_files_g, returns_files_g, SIMPLIFY = FALSE) %>%
+all_data_g <- mapply(process_files_final, sentiment_files_g, returns_files_g, SIMPLIFY = FALSE) %>%
   bind_rows()
 
-all_data_v <- mapply(process_files, sentiment_files_v, returns_files_v, SIMPLIFY = FALSE) %>%
+all_data_v <- mapply(process_files_final, sentiment_files_v, returns_files_v, SIMPLIFY = FALSE) %>%
   bind_rows()
 
 

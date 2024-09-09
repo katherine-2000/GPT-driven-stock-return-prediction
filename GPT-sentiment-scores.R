@@ -210,8 +210,8 @@ model_v <- plm(Daily.Return ~ Aggregated.Sentiment + factor(Date) + factor(Compa
 
 
 # Alternatively, use fixest library
-model_g = feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_g)
-model_v = feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_v)
+model_g <- feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_g)
+model_v <- feols(Daily.Return ~ Aggregated.Sentiment | Company + Date, data = pdata_v)
 
 summary_g <- summary(model_g, cluster ~ Company + Date)
 summary_v <- summary(model_v, cluster ~ Company + Date)

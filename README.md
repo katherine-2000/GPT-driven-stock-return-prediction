@@ -10,4 +10,4 @@ The purpose is to identify the news headlines available for the pre-selected Blu
 
 GPT model is accessed through the OpenAI Chat Completion API, utilizing the R programming language for integration and data processing.
 
-In R \texttt{openai} package enables to set a connection to OpenAI (Chat GPT) API for Chat Completion tasks. To begin, an API key must be generated from the user's OpenAI account. Subsequently, the system role is established by specifying a prompt, which serves as a context message and provides instructions to the model, detailing the user's requirements. 
+In R openai package enables to set a connection to OpenAI (Chat GPT) API for Chat Completion tasks. To begin, an API key must be generated from the user's OpenAI account. Subsequently, the system role is established by specifying a prompt, which serves as a context message and provides instructions to the model, detailing the user's requirements. 

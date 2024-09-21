@@ -4,7 +4,7 @@ This repositary provides a code used to scrape news and access the GPT model to 
 
 ## Web-scraping
 
-The purpose is to identify the news headlines available for the pre-selected Blue Chips and Growing Companies during the observed period from November 2023 to May 2024. Scraping is used to understand the media coverage and sentiment around these firms for further analysis in forecasting stock returns. 
+The purpose is to identify the news headlines available for the pre-selected Blue Chips and Growing Companies during the observed period from November 2023 to May 2024. Scraping Google News is used to understand the media coverage and sentiment around these firms for further analysis in forecasting stock returns. 
 
 ## GPT Usage
 

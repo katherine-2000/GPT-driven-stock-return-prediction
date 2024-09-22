@@ -1,6 +1,6 @@
 # Predictive Power of ChatGPT in Equity Markets
 
-This repositary provides a code used to scrape news and access the GPT model to compare the effectiveness of the Language Model in predicting stock returns for Blue Chips and Growing Companies.
+This repositary provides a code used to scrape news and access GPT-4o model to compare the effectiveness of the Language Model in predicting stock returns for Blue Chips and Growing Companies.
 
 ## Web-scraping
 
